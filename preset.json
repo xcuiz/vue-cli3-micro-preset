@@ -1,0 +1,5 @@
+{
+  "useTaobaoRegistry": true,
+  "packageManager": "yarn",
+  "useConfigFiles": false
+}
