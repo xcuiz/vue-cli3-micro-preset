@@ -33,6 +33,12 @@ module.exports = pkg => {
       },
     ]
   }, {
+    name: 'port',
+    when: answers => answers.appType === 'sub',
+    type: 'input',
+    message: 'port',
+    default: 9191
+  }, {
     name: 'remoteName',
     when: answers => answers.appType === 'main',
     type: 'input',

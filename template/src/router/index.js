@@ -4,18 +4,8 @@ import Router from "vue-router";
 const { getPublicPath } = require("@/publicPath");
 <%_ } _%>
 import routes from "./routes";
-
 <%_ if (appType === "main") { _%>
-let allRoutes = [...routes];
-
-let remote = [];
-try {
-  remote = require("<%- remoteName %>/router/routes").default;
-
-  allRoutes.push(...remote);
-} catch (e) {
-  console.error(e);
-}
+import remotes from "./remotes";
 <%_ } _%>
 
 Vue.use(Router);
@@ -25,7 +15,13 @@ const router = new Router({
   base: getPublicPath(),
   <%_ } _%>
   mode: "history",
-  routes: <%_ if (appType === "main") { _%>allRoutes<%_ } _%><%_ if (appType === "sub") { _%>routes<%_ } _%>,
+  routes,
 });
+
+<%_ if (appType === "main") { _%>
+if (remotes.length > 0) {
+  router.addRoutes(remotes)
+}
+<%_ } _%>
 
 export default router;

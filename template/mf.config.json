@@ -1,0 +1,7 @@
+{
+  "name": "<%- name %>",
+  "port": <%- port %>,
+  "exposes": {
+    "./router/routers": "./src/router/expose"
+  }
+}

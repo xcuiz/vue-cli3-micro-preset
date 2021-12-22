@@ -2,13 +2,15 @@ const GitVersionPlugin = require("git-version-html-webpack-plugin");
 const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 const ModuleFederationPlugin =
   require("webpack").container.ModuleFederationPlugin;
-<%_ if (appType === "sub") { _%>
-const { getPublicPath } = require("./src/publicPath");
+
+<%_ if (appType === "main") { _%>
+const mfServiceConfig = require("./mf.utils")
 <%_ } _%>
 
-const isProduction = process.env.NODE_ENV === "production";
-
 <%_ if (appType === "sub") { _%>
+const mfConfig = require("./mf.config")
+const { getPublicPath } = require("./src/publicPath");
+
 const getPages = () => {
   if (isProduction) {
     return {
@@ -25,12 +27,12 @@ const getPages = () => {
 };
 <%_ } _%>
 
+const isProduction = process.env.NODE_ENV === "production";
+
 module.exports = {
-  <%_ if (appType === "sub") { _%>
-  publicPath: getPublicPath(),
-  <%_ } _%>
   runtimeCompiler: true,
   <%_ if (appType === "sub") { _%>
+  publicPath: getPublicPath(),
   pages: getPages(),
   <%_ } _%>
 
@@ -49,12 +51,12 @@ module.exports = {
         filename: "remoteEntry.js",
         exposes: {
           <%_ if (appType === "sub") { _%>
-          "./router/routes": "./src/router/routes",
+          ...mfConfig.exposes
           <%_ } _%>
         },
         remotes: {
           <%_ if (appType === "main") { _%>
-          "<%- remoteName %>": "<%- remoteName %>@/<%- remoteName %>/remoteEntry.js",
+          ...mfServiceConfig.remotes,
           <%_ } _%>
         },
         shared: {
@@ -69,14 +71,14 @@ module.exports = {
 
   devServer: {
     host: "0.0.0.0",
-    port: <%_ if (appType === "main") { _%> 9090 <%_ } _%><%_ if (appType === "sub") { _%> 9191 <%_ } _%>,
+    <%_ if (appType === "sub") { _%>
+    // 子应用的时候设置端口
+    port: mfConfig.port,
+    <%_ } _%>
     <%_ if (appType === "main") { _%>
     proxy: {
       // 子应用代理
-      '/<%- remoteName %>': {
-        target: 'http://localhost:9191',
-        changeOrigin: true,
-      }
+      ...mfServiceConfig.proxy
     }
     <%_ } _%>
   },

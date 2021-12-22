@@ -1,0 +1,6 @@
+[
+  {
+    "name": "<%- remoteName %>",
+    "port": 9191
+  }
+]
